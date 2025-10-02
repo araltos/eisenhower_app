@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Button, TextInput, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 
 export default function MatrixScreen() {
   const [tasks, setTasks] = useState({
@@ -12,6 +20,9 @@ export default function MatrixScreen() {
   const [newTask, setNewTask] = useState('');
   const [activeQuadrant, setActiveQuadrant] = useState<null | keyof typeof tasks>(null);
 
+  const [editingTask, setEditingTask] = useState<{ quadrant: keyof typeof tasks; index: number } | null>(null);
+  const [editText, setEditText] = useState('');
+
   const addTask = () => {
     if (!newTask || !activeQuadrant) return;
     setTasks(prev => ({
@@ -20,6 +31,61 @@ export default function MatrixScreen() {
     }));
     setNewTask('');
     setActiveQuadrant(null);
+  };
+
+  const deleteTask = (quadrant: keyof typeof tasks, index: number) => {
+    setTasks(prev => {
+      const updated = [...prev[quadrant]];
+      updated.splice(index, 1);
+      return { ...prev, [quadrant]: updated };
+    });
+  };
+
+  const startEditing = (quadrant: keyof typeof tasks, index: number, text: string) => {
+    setEditingTask({ quadrant, index });
+    setEditText(text);
+  };
+
+  const saveEdit = () => {
+    if (!editingTask) return;
+    setTasks(prev => {
+      const updated = [...prev[editingTask.quadrant]];
+      updated[editingTask.index] = editText;
+      return { ...prev, [editingTask.quadrant]: updated };
+    });
+    setEditingTask(null);
+    setEditText('');
+  };
+
+  const renderTask = (quadrant: keyof typeof tasks, item: string, index: number) => {
+    const isEditing = editingTask?.quadrant === quadrant && editingTask.index === index;
+
+    return (
+      <View style={styles.taskRow}>
+        {isEditing ? (
+          <>
+            <TextInput
+              style={styles.input}
+              value={editText}
+              onChangeText={setEditText}
+            />
+            <Button title="Save" onPress={saveEdit} />
+          </>
+        ) : (
+          <>
+            <Text style={styles.task}>{'• '}{item}</Text>
+            <View style={styles.actions}>
+              <TouchableOpacity onPress={() => startEditing(quadrant, index, item)}>
+                <Text style={styles.edit}>✏️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteTask(quadrant, index)}>
+                <Text style={styles.delete}>❌</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </View>
+    );
   };
 
   const renderQuadrant = (
@@ -32,7 +98,7 @@ export default function MatrixScreen() {
       <FlatList
         data={tasks[key]}
         keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => <Text style={styles.task}>{'• '}{item}</Text>}
+        renderItem={({ item, index }) => renderTask(key, item, index)}
       />
       {activeQuadrant === key ? (
         <View style={styles.inputContainer}>
@@ -101,7 +167,16 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textAlign: 'center',
   },
-  task: { fontSize: 12, marginVertical: 2 },
+  taskRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 2,
+  },
+  task: { fontSize: 12, flex: 1 },
+  actions: { flexDirection: 'row', marginLeft: 6 },
+  edit: { marginHorizontal: 4, fontSize: 14 },
+  delete: { marginHorizontal: 4, fontSize: 14, color: 'red' },
 
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 4 },
   input: {
