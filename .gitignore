@@ -1,41 +1,82 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# Node
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json#*   # partial locks created during conflicts
 
-# Expo
+# Expo / React Native
 .expo/
+.expo-shared/
 dist/
 web-build/
-expo-env.d.ts
+.bundle/
+.expo-packager/
+*.expo.dev.json
 
-# Native
-.kotlin/
-*.orig.*
+# iOS (if you later add native ios/ folder with prebuild or EAS)
+ios/build/
+ios/DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.pbxuser
+*.mode1v3
+*.mode2v3
+
+# Android (if you later add native android/ folder with prebuild or EAS)
+android/.gradle/
+android/.idea/
+android/local.properties
+android/captures/
+android/app/build/
+*.iml
+
+# Debugging / Metro / Watchman
+*.log
+logs/
+*.pid
+.pnpm-debug.log*
+.watchmanconfig
+.metro-cache/
+tmp/
+temp/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.keystore
 *.jks
-*.p8
 *.p12
 *.key
-*.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
 *.pem
+*.der
+*.mobileprovision
+*.bak
+secrets.*
+credentials.json
+service-account*.json
+GoogleService-Info.plist
+android/app/google-services.json
 
-# local env files
-.env*.local
+# OS / Editor noise
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
 
-# typescript
-*.tsbuildinfo
-
-# generated native folders
-/ios
-/android
+# VS Code / IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
